@@ -25,7 +25,7 @@ async def upload_picture(file: UploadFile = File(...)):
     with picture_path.open("wb") as buffer:
         shutil.copyfileobj(file.file, buffer)
     
-    voice_file_path = TEMP_DIR / f"{uuid.uuid4()}.mp3"
+    voice_file_path = TEMP_DIR / "processed_audio.mp3"
     with voice_file_path.open("wb") as buffer:
         buffer.write(b"Dummy voice data")
     
@@ -39,7 +39,7 @@ async def upload_voice(file: UploadFile = File(...)):
     with voice_input_path.open("wb") as buffer:
         shutil.copyfileobj(file.file, buffer)
     
-    processed_voice_path = TEMP_DIR / f"{uuid.uuid4()}.mp3"
+    processed_voice_path = TEMP_DIR / "processed_audio.mp3"
     with processed_voice_path.open("wb") as buffer:
         buffer.write(b"Processed voice data")
     
