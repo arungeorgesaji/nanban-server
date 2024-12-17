@@ -32,24 +32,20 @@ def text_to_speech(text, lang='en', output_file):
 
 @app.post("/object-detection/")
 async def process_image(file: UploadFile = File(...)):
-    unique_filename = f"{uuid.uuid4()}.jpg"
-    
-    picture_path = TEMP_DIR / unique_filename
-    with picture_path.open("wb") as buffer:
+    picture_file_path = TEMP_DIR / f"{uuid.uuid4()}.jpg"
+    with picture_file_path.open("wb") as buffer:
         shutil.copyfileobj(file.file, buffer)
    
-    detected_description = detect_objects(picture_path)
-    voice_file_path = "processed_audio.mp3"
-    text_to_speech(detected_description, voice_file_path)
+    detected_description = detect_objects(picture_file_path)
+
+    speech_file_path = TEMP_DIR / f"{uuid.uuid4()}.mp3"
+    text_to_speech(detected_description, speech_file_path)
     
     return FileResponse(voice_file_path, media_type="audio/mpeg", filename=voice_file_path.name)
 
-@app.post("/voice-assistant/")
-async def process_voice(file: UploadFile = File(...)):
-    unique_filename = f"{uuid.uuid4()}.mp3"
-    
-    assistant_response = voice_mode() 
-    voice_file_path = "processed_audio.mp3"
-    text_to_speech(assistant_response, voice_file_path)
+async def process_voice(query: str):
+    assistant_response = voice_mode(query)  
+    response_audio_path = TEMP_DIR / f"{uuid.uuid4()}.mp3"
+    text_to_speech(assistant_response, response_audio_path)
 
-    return FileResponse(processed_voice_path, media_type="audio/mpeg", filename=processed_voice_path.name)
+    return FileResponse(response_audio_path, media_type="audio/mpeg", filename=unique_filename)

@@ -86,9 +86,7 @@ def get_response(input_text):
     clean_response = remove_unwanted_characters(response)
     return clean_response
 
-def voice_mode():
-    query = takecommand().lower()
-    
+def voice_mode(query):
     if query == 'error':
         return
     else:
