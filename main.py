@@ -26,7 +26,7 @@ model = YOLO(MODEL_dir + "yolov8m-seg.pt")
 object_widths = load_object_widths("object_widths.yaml")
 
 @app.post("/object-detection/")
-async def upload_picture(file: UploadFile = File(...)):
+async def process_image(file: UploadFile = File(...)):
     unique_filename = f"{uuid.uuid4()}.jpg"
     
     picture_path = TEMP_DIR / unique_filename
@@ -40,15 +40,12 @@ async def upload_picture(file: UploadFile = File(...)):
     return FileResponse(voice_file_path, media_type="audio/mpeg", filename=voice_file_path.name)
 
 @app.post("/voice-assistant/")
-async def upload_voice(file: UploadFile = File(...)):
+async def process_voice(file: UploadFile = File(...)):
     unique_filename = f"{uuid.uuid4()}.mp3"
     
     voice_input_path = TEMP_DIR / unique_filename
     with voice_input_path.open("wb") as buffer:
         shutil.copyfileobj(file.file, buffer)
-    
-    
-
 
     return FileResponse(processed_voice_path, media_type="audio/mpeg", filename=processed_voice_path.name)
 
