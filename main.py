@@ -22,11 +22,8 @@ TEMP_DIR.mkdir(exist_ok=True)
 
 MODEL_DIR = Path("models")
 MODEL_DIR.mkdir(exist_ok=True) 
-model = YOLO(MODEL_dir + "yolov8m-seg.pt")
 
-object_widths = load_object_widths("object_widths.yaml")
-
-def text_to_speech(text, lang='en', output_file):
+def text_to_speech(text, output_file, lang='en'):
     tts = gTTS(text=text, lang=lang)
     tts.save(output_file)
 

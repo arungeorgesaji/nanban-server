@@ -4,7 +4,12 @@ import math
 import yaml
 import cv2
 
-def calculate_distance(sensor_width = 790, focal_length = 3.63, object_pixel_width, screen_pixel_width, true_width):
+sensor_width = 790
+focal_length = 3.63
+object_widths = load_object_widths("object_widths.yaml")
+model = YOLO(MODEL_DIR / "yolov8m-seg.pt")
+
+def calculate_distance(sensor_width, focal_length, object_pixel_width, screen_pixel_width, true_width):
     fov = 2 * math.atan(0.5 * sensor_width / focal_length)
     angle_of_arc = fov * (object_pixel_width / screen_pixel_width)
     true_distance = (true_width / 2) / math.tan(angle_of_arc / 2)

@@ -1,17 +1,6 @@
-import subprocess
-import spotipy
-from spotipy.oauth2 import SpotifyClientCredentials
-import requests
 from bs4 import BeautifulSoup
 import datetime
 import json
-import io
-from pytube import YouTube
-from youtube_search import YoutubeSearch
-from pydub import AudioSegment
-from pydub.playback import play
-import speech_recognition as sr
-import keyboard
 import os
 from huggingface_hub import login
 from langchain.llms import HuggingFaceHub
