@@ -25,10 +25,6 @@ model = YOLO(MODEL_dir + "yolov8m-seg.pt")
 
 object_widths = load_object_widths("object_widths.yaml")
 
-def text_to_speech(text, lang='en', output_file):
-    tts = gTTS(text=text, lang=lang)
-    tts.save(output_file)
-
 @app.post("/object-detection/")
 async def upload_picture(file: UploadFile = File(...)):
     unique_filename = f"{uuid.uuid4()}.jpg"
@@ -51,9 +47,8 @@ async def upload_voice(file: UploadFile = File(...)):
     with voice_input_path.open("wb") as buffer:
         shutil.copyfileobj(file.file, buffer)
     
-    processed_voice_path = "processed_audio.mp3"
-    with processed_voice_path.open("wb") as buffer:
-        buffer.write(b"Processed voice data")
     
+
+
     return FileResponse(processed_voice_path, media_type="audio/mpeg", filename=processed_voice_path.name)
 
