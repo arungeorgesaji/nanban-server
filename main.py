@@ -31,7 +31,7 @@ def text_to_speech(text, lang='en', output_file):
     tts.save(output_file)
 
 @app.post("/object-detection/")
-async def process_image(file: UploadFile = File(...)):
+async def object_detection(file: UploadFile = File(...)):
     picture_file_path = TEMP_DIR / f"{uuid.uuid4()}.jpg"
     with picture_file_path.open("wb") as buffer:
         shutil.copyfileobj(file.file, buffer)
@@ -43,7 +43,8 @@ async def process_image(file: UploadFile = File(...)):
     
     return FileResponse(voice_file_path, media_type="audio/mpeg", filename=voice_file_path.name)
 
-async def process_voice(query: str):
+@app.post("/voice-assistant/")
+async def voice_assistant(query: str):
     assistant_response = voice_mode(query)  
     response_audio_path = TEMP_DIR / f"{uuid.uuid4()}.mp3"
     text_to_speech(assistant_response, response_audio_path)
