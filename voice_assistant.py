@@ -12,7 +12,6 @@ from pydub import AudioSegment
 from pydub.playback import play
 import speech_recognition as sr
 import keyboard
-from gtts import gTTS
 import os
 from huggingface_hub import login
 from langchain.llms import HuggingFaceHub
@@ -20,18 +19,9 @@ from dotenv import load_dotenv
 
 load_dotenv()
 IPDATA_API_KEY = os.getenv("IPDATA_API_KEY")
-SPOTIFY_CLIENT_ID = os.getenv("SPOTIFY_CLIENT_ID")
-SPOTIFY_CLIENT_SECRET = os.getenv("SPOTIFY_CLIENT_SECRET")
 HUGGINGFACEHUB_API_TOKEN = os.getenv("HUGGINGFACEHUB_API_TOKEN") 
 
 gemma7b = HuggingFaceHub(repo_id='google/gemma-1.1-7b-it')
-
-client_credentials_manager = SpotifyClientCredentials(client_id=client_id, client_secret=client_secret)
-sp = spotipy.Spotify(client_credentials_manager=client_credentials_manager)
-
-def text_to_speech(text, lang='en', output_file):
-    tts = gTTS(text=text, lang=lang)
-    tts.save(output_file)
 
 def remove_unwanted_characters(input_text):
     characters_to_remove = ["*", "_", "?", ">", "<", "=", "^", "(", ")", "{", "}", "[", "]", "#", "'", "#", "`"]
@@ -94,81 +84,12 @@ def get_response(input_text):
     length = "as long as possible"
     response = gemma7b_response(input_text, context, length)
     clean_response = remove_unwanted_characters(response)
-    speak(clean_response)
-
-def search_song():
-    while True:
-        speak("please confirm the song you want to hear or use exit to exit")
-        video = takecommand().lower()
-    
-        if video == "error":
-            continue
-        elif video == "exit":
-            speak("Exiting music mode")
-            break
-
-        results = YoutubeSearch(video, max_results=1).to_dict()
-        if results:
-            video_id = results[0]['id']
-            url = f"https://www.youtube.com/watch?v={video_id}"
-            speak("Downloading song from youtube...")
-            download_audio(url)
-            speak("Playing song...")
-            play_song()
-        else:
-            speak("song not found")
-
-def download_audio(url):
-    yt = YouTube(url)
-    audio_stream = yt.streams.filter(only_audio=True).first()
-    audio_stream.download(output_path=".", filename="temp_song")
-
-def play_song():
-    song = AudioSegment.from_file("temp_song")
-    play(song)
-
-def helpline(input_text):
-    speak("please ask the questions you want and use exit to exit whenever you want")
-    context = """
-    [Your existing helpline context here]
-    """
-    instruction = """
-    Please use the context to help you answer the question, the user is a blind person 
-    who is using nanban which a device running on the raspberry pi 5. You are being used in the nanban
-    helpline to help the use remember this guy is a blind person he might not be able to do a lot of things
-    he might not even know that a raspberry pi is inside dont go like display nanban doesnt have a display 
-    the complete communication is through voice remember you can use questions outside the context
-    these you could consider as some examples to get an idea of how to answer and if a similar 
-    question pops up you can easily answer. Please answer to just what the user asks dont try to do anything else
-    """
-    
-    while True:
-        query = takecommand().lower()
-        if query == "exit":
-            speak("Exiting help mode")
-            break
-        else:
-            template = f"""
-            ###context:{context},
-            ###Instruction: {instruction},
-            ###length: as long as possible never stop in between this will cause confuse the blind person
-            ###question:{query},
-            ###answer:
-            """
-            response = gemma7b(template).split("###answer:")[1].split("**Answer:**")[0]
-            clean_response = remove_unwanted_characters(response)
-            speak(clean_response)
+    return clean_response
 
 def voice_mode():
     query = takecommand().lower()
     
     if query == 'error':
         return
-        
-    if query in ["music mode", "music mod"]:
-        search_song() 
-    elif query in ["help mode", "help mod"]:
-        helpline(query)
     else:
-        get_response(query)
-
+        return get_response(query)

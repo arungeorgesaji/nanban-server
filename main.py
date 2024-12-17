@@ -4,6 +4,7 @@ from fastapi.responses import FileResponse
 import shutil
 import uuid
 from pathlib import Path
+from gtts import gTTS
 from voice_assistant import *
 from object_detection import * 
 
@@ -25,6 +26,10 @@ model = YOLO(MODEL_dir + "yolov8m-seg.pt")
 
 object_widths = load_object_widths("object_widths.yaml")
 
+def text_to_speech(text, lang='en', output_file):
+    tts = gTTS(text=text, lang=lang)
+    tts.save(output_file)
+
 @app.post("/object-detection/")
 async def process_image(file: UploadFile = File(...)):
     unique_filename = f"{uuid.uuid4()}.jpg"
@@ -43,9 +48,8 @@ async def process_image(file: UploadFile = File(...)):
 async def process_voice(file: UploadFile = File(...)):
     unique_filename = f"{uuid.uuid4()}.mp3"
     
-    voice_input_path = TEMP_DIR / unique_filename
-    with voice_input_path.open("wb") as buffer:
-        shutil.copyfileobj(file.file, buffer)
+    assistant_response = voice_mode() 
+    voice_file_path = "processed_audio.mp3"
+    text_to_speech(assistant_response, voice_file_path)
 
     return FileResponse(processed_voice_path, media_type="audio/mpeg", filename=processed_voice_path.name)
-
