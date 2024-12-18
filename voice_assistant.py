@@ -77,6 +77,6 @@ def get_response(input_text):
 
 def voice_mode(query):
     if query == 'error':
-        return
+        return "I'm sorry, I didn't understand that."
     else:
         return get_response(query)

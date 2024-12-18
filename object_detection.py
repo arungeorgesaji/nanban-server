@@ -1,4 +1,5 @@
 import os
+from pathlib import Path
 from ultralytics import YOLO
 import math
 import yaml
@@ -6,7 +7,9 @@ import cv2
 
 sensor_width = 790
 focal_length = 3.63
-object_widths = load_object_widths("object_widths.yaml")
+
+MODEL_DIR = Path("models")
+MODEL_DIR.mkdir(exist_ok=True) 
 model = YOLO(MODEL_DIR / "yolov8m-seg.pt")
 
 def calculate_distance(sensor_width, focal_length, object_pixel_width, screen_pixel_width, true_width):
@@ -58,3 +61,8 @@ def detect_objects(image_filename):
                 distance = calculate_distance(sensor_width, focal_length, int(x_max)-int(x_min), frame_width, true_width)
                 message = f"There is a {name}, around {distance:.2f} centimeters away and it is in your {position}."
                 return message
+            else:
+                return "no_object"
+
+
+object_widths = load_object_widths("object_widths.yaml")

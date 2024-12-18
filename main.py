@@ -3,7 +3,6 @@ from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import FileResponse
 import shutil
 import uuid
-from pathlib import Path
 from gtts import gTTS
 from voice_assistant import *
 from object_detection import * 
@@ -20,9 +19,6 @@ app.add_middleware(
 TEMP_DIR = Path("temp")
 TEMP_DIR.mkdir(exist_ok=True)
 
-MODEL_DIR = Path("models")
-MODEL_DIR.mkdir(exist_ok=True) 
-
 def text_to_speech(text, output_file, lang='en'):
     tts = gTTS(text=text, lang=lang)
     tts.save(output_file)
@@ -35,14 +31,19 @@ async def object_detection(file: UploadFile = File(...)):
    
     detected_description = detect_objects(picture_file_path)
 
-    speech_file_path = TEMP_DIR / f"{uuid.uuid4()}.mp3"
-    text_to_speech(detected_description, speech_file_path)
-    
-    return FileResponse(voice_file_path, media_type="audio/mpeg", filename=voice_file_path.name)
+    if detected_description == "no_object": 
+        return JSONResponse(
+            status_code=422
+        )
+    else:
+        speech_file_path = TEMP_DIR / f"{uuid.uuid4()}.mp3"
+        text_to_speech(detected_description, speech_file_path)
+        
+        return FileResponse(speech_file_path, media_type="audio/mpeg", filename=speech_file_path.name)
 
 @app.post("/voice-assistant/")
 async def voice_assistant(query: str):
-    assistant_response = voice_mode(query)  
+    assistant_response = voice_mode(query) 
     response_audio_path = TEMP_DIR / f"{uuid.uuid4()}.mp3"
     text_to_speech(assistant_response, response_audio_path)
 
