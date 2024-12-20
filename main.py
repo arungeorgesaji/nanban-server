@@ -48,3 +48,7 @@ async def voice_assistant(query: str):
     text_to_speech(assistant_response, response_audio_path)
 
     return FileResponse(response_audio_path, media_type="audio/mpeg", filename=unique_filename)
+
+@app.get("/")
+async def root():
+    return {"status": "healthy"}
