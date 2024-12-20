@@ -1,0 +1,11 @@
+ultralytics
+pyyaml
+opencv-python
+beautifulsoup4
+huggingface-hub
+langchain
+python-dotenv
+fastapi
+uvicorn
+gtts
+
